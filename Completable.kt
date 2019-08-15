@@ -1,4 +1,3 @@
-
 class Completable<S, F> {
 
     lateinit var success: (S) -> Unit
@@ -29,16 +28,13 @@ class Completable<S, F> {
     private fun flowResult(result: Result<S, F>) {
         nextCompletable?.run { flowMap(result, this) }
                 ?: headCompletable?.run { flowMap(result, this) }
-                ?: when (result) {
-                    is Result.Success -> success(result.value)
-                    is Result.Failure -> failure(result.value)
-                }
+                ?: result.flow({ success(it) }, { failure(it) })
     }
 
     @Suppress("UNCHECKED_CAST")
-    private fun flowMap(result: Result<S, F>, completable: Completable<Any, F>) {
-        completable.mapper?.run { completable.result = result.mapSuccess(this as (S) -> Any) }
-    }
+    private fun flowMap(result: Result<S, F>, completable: Completable<Any, F>) = completable
+            .mapper?.run { completable.result = result.mapSuccess(this as (S) -> Any) }
+
 
 }
 
