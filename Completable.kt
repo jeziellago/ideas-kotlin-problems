@@ -2,7 +2,7 @@ class Completable<S, F> {
 
     lateinit var success: (S) -> Unit
     lateinit var failure: (F) -> Unit
-    lateinit var callable: () -> DisposableTask
+    lateinit var callable: () -> Unit
 
     var mapper: ((S) -> Any)? = null
     var nextCompletable: Completable<Any, F>? = null
@@ -20,7 +20,7 @@ class Completable<S, F> {
         this.failure = failure
     }
 
-    fun complete(): DisposableTask {
+    fun complete() {
         return headCompletable?.callable?.invoke()
                 ?: callable.invoke()
     }
